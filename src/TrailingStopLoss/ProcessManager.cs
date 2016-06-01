@@ -27,6 +27,8 @@
             this.allWindows13s.Add(@event.InstrumentId, new List<int> { @event.Price });
 
             this.messagePublisher.Publish(new StopLossPriceUpdated { InstrumentId = @event.InstrumentId, Price = @event.Price });
+            this.messagePublisher.Publish(new SendToMeIn { Seconds = 10, Message = new RemoveFrom10sWindow { InstrumentId = @event.InstrumentId, Price = @event.Price } });
+            this.messagePublisher.Publish(new SendToMeIn { Seconds = 13, Message = new RemoveFrom13sWindow { InstrumentId = @event.InstrumentId, Price = @event.Price } });
         }
 
         public void Handle(PriceUpdated @event)
@@ -36,7 +38,7 @@
 
             this.messagePublisher.Publish(new StopLossPriceUpdated { InstrumentId = @event.InstrumentId, Price = @event.Price });
             this.messagePublisher.Publish(new SendToMeIn { Seconds = 10, Message = new RemoveFrom10sWindow { InstrumentId = @event.InstrumentId, Price = @event.Price } });
-            this.messagePublisher.Publish(new SendToMeIn { Seconds = 13, Message = new RemoveFrom10sWindow { InstrumentId = @event.InstrumentId, Price = @event.Price } });
+            this.messagePublisher.Publish(new SendToMeIn { Seconds = 13, Message = new RemoveFrom13sWindow { InstrumentId = @event.InstrumentId, Price = @event.Price } });
         }
 
         public void Handle(RemoveFrom10sWindow @event)

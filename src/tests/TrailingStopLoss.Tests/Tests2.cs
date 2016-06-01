@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Commands;
     using Events;
     using FakeItEasy;
     using FluentAssertions;
@@ -41,12 +42,7 @@
         }
 
         [Scenario]
-        public void AquireAPositionAndRemoveThePriceIn10Seconds(
-            IMessagePublisher messagePublisher,
-            ProcessManager processorManager,
-            int initialPrice,
-            List<object> messagesPublished,
-            Guid instrumentId)
+        public void AquireAPosition(int initialPrice)
         {
             "Given an initial price"
                 .f(() => initialPrice = 12345);
@@ -54,12 +50,28 @@
             "When I acquire a position with that initial price"
                 .f(() => this.processorManager.Handle(new PositionAcquired { InstrumentId = instrumentId, Price = initialPrice }));
 
-            "Then a message is published to remove the price in 10 seconds"
+            "Then a message is published update the stop loss price"
                 .f(() =>
                 {
-                    this.messagesPublished.Count.Should().Be(1);
-                    var message = messagesPublished.Single() as StopLossPriceUpdated;
-                    message.Should().NotBeNull();
+                    var message = (StopLossPriceUpdated)this.messagesPublished[0];
+                    message.InstrumentId.Should().Be(instrumentId);
+                    message.Price.Should().Be(initialPrice);
+                });
+
+            "And a message is published to remove the price in 10 seconds"
+                .f(() =>
+                {
+                    var callback = (SendToMeIn)this.messagesPublished[1];
+                    var message = (RemoveFrom10sWindow)callback.Message;
+                    message.InstrumentId.Should().Be(instrumentId);
+                    message.Price.Should().Be(initialPrice);
+                });
+
+            "Then a message is published to remove the price in 13 seconds"
+                .f(() =>
+                {
+                    var callback = (SendToMeIn)this.messagesPublished[2];
+                    var message = (RemoveFrom13sWindow)callback.Message;
                     message.InstrumentId.Should().Be(instrumentId);
                     message.Price.Should().Be(initialPrice);
                 });
