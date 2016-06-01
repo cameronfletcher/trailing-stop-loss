@@ -4,7 +4,7 @@
 
     public class RemoveFrom13sWindow
     {
-        public Guid Id { get; set; }
+        public Guid InstrumentId { get; set; }
 
         public int Price { get; set; }
     }

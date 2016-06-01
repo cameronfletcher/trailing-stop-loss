@@ -14,39 +14,49 @@
         public void AquireAPosition(
             IMessagePublisher messagePublisher,
             ProcessManager processorManager,
+            Guid instrumentId,
             int initialPrice,
-            List<object> eventsPublished)
+            List<object> messagePublished)
         {
             "Given a message publisher"
                 .f(() =>
                 {
-                    eventsPublished = new List<object>();
+                    messagePublished = new List<object>();
                     messagePublisher = A.Fake<IMessagePublisher>();
 
                     A.CallTo(() => messagePublisher.Publish(A<object>.Ignored))
                     .Invokes(call => 
                     {
-                        var message = ((object)call.Arguments.First());
-                        eventsPublished.Add(message);
+                        var message = (call.Arguments.First());
+                        messagePublished.Add(message);
                     });
                 });
 
             "And a process manager"
                 .f(() => { processorManager = new ProcessManager(messagePublisher); });
 
+            "And an instrument ID"
+                .f(() => { instrumentId = Guid.NewGuid(); });
+
             "When I aquire a position"
                 .f(() =>
                 {
                     initialPrice = 23556;
-                    processorManager.Handle(new Events.PositionAcquired() { Id = Guid.NewGuid(), Price = initialPrice });
+                    processorManager.Handle(
+                        new Events.PositionAcquired()
+                        {
+                            InstrumentId = instrumentId,
+                            Price = initialPrice
+                        });
                 });
 
             "Then I publish a message to update the stop loss price"
                 .f(() =>
                 {
-                    eventsPublished.Count.Should().Be(1);
-                    var command = eventsPublished.Single() as Events.StopLossPriceUpdated;
+                    messagePublished.Count.Should().Be(1);
+                    var command = messagePublished.Single() as Events.StopLossPriceUpdated;
                     command.Should().NotBeNull();
+                    command.InstrumentId.Should().Be(instrumentId);
                     command.Price.Should().Be(initialPrice);
                 });
         }
