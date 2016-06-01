@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B776598B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrailingStopLoss", "TrailingStopLoss\TrailingStopLoss.csproj", "{3BAF711A-7898-43BE-983E-A54FF1E1C339}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrailingStopLoss.Tests", "tests\TrailingStopLoss.Tests\TrailingStopLoss.Tests.csproj", "{E01DB0BD-8DDD-4987-AE4D-E38EF5703F64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,8 +35,15 @@ Global
 		{3BAF711A-7898-43BE-983E-A54FF1E1C339}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BAF711A-7898-43BE-983E-A54FF1E1C339}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BAF711A-7898-43BE-983E-A54FF1E1C339}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E01DB0BD-8DDD-4987-AE4D-E38EF5703F64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E01DB0BD-8DDD-4987-AE4D-E38EF5703F64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E01DB0BD-8DDD-4987-AE4D-E38EF5703F64}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{E01DB0BD-8DDD-4987-AE4D-E38EF5703F64}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E01DB0BD-8DDD-4987-AE4D-E38EF5703F64} = {B776598B-AC1C-4AC8-96EB-E5FA4F7D19AB}
 	EndGlobalSection
 EndGlobal
