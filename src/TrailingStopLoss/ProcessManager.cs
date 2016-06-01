@@ -51,7 +51,7 @@
             list.RemoveAt(index);
 
             this.stopLossPrice = list.Min();
-            this.messagePublisher.Publish(new StopLossPriceUpdated { InstrumentId = @event.InstrumentId, Price = @event.Price });            
+            this.messagePublisher.Publish(new StopLossPriceUpdated { InstrumentId = @event.InstrumentId, Price = this.stopLossPrice });            
         }
 
         public void Handle(RemoveFrom13sWindow @event)
