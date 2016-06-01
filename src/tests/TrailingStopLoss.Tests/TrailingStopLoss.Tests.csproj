@@ -26,6 +26,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Tests2.cs" />
     <Compile Include="Tests.cs" />
   </ItemGroup>
   <ItemGroup>

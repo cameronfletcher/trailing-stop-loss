@@ -1,13 +1,13 @@
 ﻿namespace TrailingStopLoss.Tests
 {
     using System;
-    using System.Linq;
-    using FluentAssertions;
-    using Xbehave;
-    using TrailingStopLoss;
-    using FakeItEasy;
     using System.Collections.Generic;
-    using Xunit;
+    using System.Linq;
+    using FakeItEasy;
+    using FluentAssertions;
+    using TrailingStopLoss;
+    using Xbehave;
+
     public class Tests
     {
         [Scenario]
