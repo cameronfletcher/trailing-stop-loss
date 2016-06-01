@@ -91,5 +91,56 @@
                     message.InstrumentId.Should().Be(this.instrumentId);
                 });
         }
+
+        [Scenario]
+        public void StopLossTriggerred2(int initialPrice, int secondPrice, int thirdPrice)
+        {
+            "Given an initial price"
+                .f(() => initialPrice = 10);
+
+            "Given an second price"
+                .f(() => secondPrice = 20);
+
+            "Given an second price"
+                .f(() => thirdPrice = 8);
+
+            "When I acquire a position with that initial price"
+                .f(() => this.processorManager.Handle(new PositionAcquired { InstrumentId = instrumentId, Price = initialPrice }));
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new PriceUpdated { InstrumentId = instrumentId, Price = secondPrice }));
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new PriceUpdated { InstrumentId = instrumentId, Price = thirdPrice }));
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new RemoveFrom10sWindow { InstrumentId = instrumentId, Price = initialPrice }));
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new RemoveFrom10sWindow { InstrumentId = instrumentId, Price = secondPrice }));
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new RemoveFrom10sWindow { InstrumentId = instrumentId, Price = thirdPrice }));
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new RemoveFrom13sWindow { InstrumentId = instrumentId, Price = initialPrice }));
+
+            "And I clear the published messages"
+                .f(() => this.messagesPublished.Clear());
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new RemoveFrom13sWindow { InstrumentId = instrumentId, Price = secondPrice }));
+
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new RemoveFrom13sWindow { InstrumentId = instrumentId, Price = thirdPrice }));
+
+            "Then a message is published to update the stop loss price"
+                .f(() =>
+                {
+                    var message = (StopLossHit)this.messagesPublished[0];
+                    message.InstrumentId.Should().Be(this.instrumentId);
+                });
+        }
     }
 }
