@@ -36,8 +36,8 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Commands\RemoveFrom10Window.cs" />
-    <Compile Include="Commands\RemoveFrom13Window.cs" />
+    <Compile Include="Commands\RemoveFrom10sWindow.cs" />
+    <Compile Include="Commands\RemoveFrom13sWindow.cs" />
     <Compile Include="Events\PositionAcquired.cs" />
     <Compile Include="Events\PriceUpdated.cs" />
     <Compile Include="Events\StopLossHit.cs" />

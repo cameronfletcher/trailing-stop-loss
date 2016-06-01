@@ -2,7 +2,7 @@
 {
     using System;
 
-    public class RemoveFrom13Window
+    public class RemoveFrom13sWindow
     {
         public Guid Id { get; set; }
 
