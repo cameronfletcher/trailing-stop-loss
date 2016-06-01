@@ -1,4 +1,4 @@
-Skeleton
-========
+TrailingStopLoss
+================
 
-An skeleton solution.
+A thing.
