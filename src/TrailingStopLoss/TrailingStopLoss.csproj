@@ -34,12 +34,15 @@
     <CodeAnalysisRuleSet>..\TrailingStopLoss.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands\RemoveFrom10Window.cs" />
+    <Compile Include="Commands\RemoveFrom13Window.cs" />
     <Compile Include="Events\PositionAcquired.cs" />
     <Compile Include="Events\PriceUpdated.cs" />
     <Compile Include="Events\StopLossHit.cs" />
     <Compile Include="Events\StopLossPriceUpdated.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Commands\SendToMeIn.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -47,6 +50,7 @@
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
