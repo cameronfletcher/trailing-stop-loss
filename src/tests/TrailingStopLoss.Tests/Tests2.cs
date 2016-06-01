@@ -135,7 +135,7 @@
             "And I get a price update"
                 .f(() => this.processorManager.Handle(new RemoveFrom10sWindow { InstrumentId = instrumentId, Price = initialPrice }));
 
-            "Then a message is published to remove the second price in 10 seconds"
+            "Then a message is published to update the stop loss price"
                 .f(() =>
                 {
                     var message = (StopLossPriceUpdated)this.messagesPublished[0];
