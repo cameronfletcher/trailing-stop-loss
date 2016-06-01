@@ -35,8 +35,8 @@
             this.allWindows13s[@event.Id].Add(@event.Price);
 
             this.messagePublisher.Publish(new StopLossPriceUpdated { Id = @event.Id, Price = @event.Price });
-            this.messagePublisher.Publish(new SendToMeIn { Id = @event.Id, Seconds = 10, Message = "" });
-            this.messagePublisher.Publish(new SendToMeIn { Id = @event.Id, Seconds = 13, Message = "" });
+            this.messagePublisher.Publish(new SendToMeIn { Seconds = 10, Message = new RemoveFrom10sWindow { Id = @event.Id, Price = @event.Price } });
+            this.messagePublisher.Publish(new SendToMeIn { Seconds = 13, Message = new RemoveFrom10sWindow { Id = @event.Id, Price = @event.Price } });
         }
 
         public void Handle(RemoveFrom10sWindow @event)
