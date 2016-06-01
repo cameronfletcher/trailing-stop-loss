@@ -98,7 +98,7 @@
             "Then a message is published to remove the second price in 10 seconds"
                 .f(() =>
                 {
-                    var callback = (SendToMeIn)this.messagesPublished[1];
+                    var callback = (SendToMeIn)this.messagesPublished[0];
                     var message = (RemoveFrom10sWindow)callback.Message;
                     message.InstrumentId.Should().Be(this.instrumentId);
                     message.Price.Should().Be(secondPrice);
@@ -107,7 +107,7 @@
             "And a message is published to remove the second price in 13 seconds"
                 .f(() =>
                 {
-                    var callback = (SendToMeIn)this.messagesPublished[2];
+                    var callback = (SendToMeIn)this.messagesPublished[1];
                     var message = (RemoveFrom13sWindow)callback.Message;
                     message.InstrumentId.Should().Be(this.instrumentId);
                     message.Price.Should().Be(secondPrice);
