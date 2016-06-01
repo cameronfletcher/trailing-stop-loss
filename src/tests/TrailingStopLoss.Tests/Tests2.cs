@@ -67,7 +67,7 @@
                     message.Price.Should().Be(initialPrice);
                 });
 
-            "Then a message is published to remove the price in 13 seconds"
+            "And a message is published to remove the price in 13 seconds"
                 .f(() =>
                 {
                     var callback = (SendToMeIn)this.messagesPublished[2];
@@ -104,7 +104,7 @@
                     message.Price.Should().Be(secondPrice);
                 });
 
-            "Then a message is published to remove the second price in 13 seconds"
+            "And a message is published to remove the second price in 13 seconds"
                 .f(() =>
                 {
                     var callback = (SendToMeIn)this.messagesPublished[2];
@@ -113,5 +113,36 @@
                     message.Price.Should().Be(secondPrice);
                 });
         }
+
+        [Scenario]
+        public void AquireAPositionAndPriceUpdatedAnd10sWindowHit(int initialPrice, int secondPrice)
+        {
+            "Given an initial price"
+                .f(() => initialPrice = 10);
+
+            "Given an second price"
+                .f(() => secondPrice = 20);
+
+            "When I acquire a position with that initial price"
+                .f(() => this.processorManager.Handle(new PositionAcquired { InstrumentId = instrumentId, Price = initialPrice }));
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new PriceUpdated { InstrumentId = instrumentId, Price = secondPrice }));
+
+            "And I clear the published messages"
+                .f(() => this.messagesPublished.Clear());
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new RemoveFrom10sWindow { InstrumentId = instrumentId, Price = initialPrice }));
+
+            "Then a message is published to remove the second price in 10 seconds"
+                .f(() =>
+                {
+                    var message = (StopLossPriceUpdated)this.messagesPublished[0];
+                    message.InstrumentId.Should().Be(this.instrumentId);
+                    message.Price.Should().Be(secondPrice);
+                });
+        }
+
     }
 }
