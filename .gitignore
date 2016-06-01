@@ -1,0 +1,15 @@
+/[Pp]ackages/*
+!/[Pp]ackages/NuGet.CommandLine.*
+/[Bb]uild/
+[Bb]in/
+[Oo]bj/
+[Tt]est[Rr]esults
+*.suo
+*.user
+*.sln.cache
+*.sln.docstates
+StyleCop.Cache
+_ReSharper*
+Thumbs.db
+*.sln.ide
+.vs/
