@@ -1,5 +1,6 @@
 ﻿namespace TrailingStopLoss
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Commands;
@@ -8,8 +9,8 @@
     public class ProcessManager
     {
         // TODO (Cameron): This type is wrong.
-        private readonly List<int> window10s = new List<int>();
-        private readonly List<int> window13s = new List<int>();
+        private readonly Dictionary<Guid, List<int>> allWindows10s = new Dictionary<Guid, List<int>>();
+        private readonly Dictionary<Guid, List<int>> allWindows13s = new Dictionary<Guid, List<int>>();
 
         private readonly IMessagePublisher messagePublisher;
 
@@ -22,30 +23,36 @@
 
         public void Handle(PositionAcquired @event)
         {
-            this.window10s.Add(@event.Price);
-            this.window13s.Add(@event.Price);
+            this.allWindows10s.Add(@event.Id, new List<int> { @event.Price });
+            this.allWindows13s.Add(@event.Id, new List<int> { @event.Price });
 
-            this.messagePublisher.Publish(new StopLossPriceUpdated { Price = @event.Price });
+            this.messagePublisher.Publish(new StopLossPriceUpdated { Id = @event.Id, Price = @event.Price });
         }
 
         public void Handle(PriceUpdated @event)
         {
-            this.window10s.Add(@event.Price);
-            this.window13s.Add(@event.Price);
+            this.allWindows10s[@event.Id].Add(@event.Price);
+            this.allWindows13s[@event.Id].Add(@event.Price);
 
-            this.messagePublisher.Publish(new StopLossPriceUpdated { Price = @event.Price });
+            this.messagePublisher.Publish(new StopLossPriceUpdated { Id = @event.Id, Price = @event.Price });
+            this.messagePublisher.Publish(new SendToMeIn { Id = @event.Id, Seconds = 10, Message = "" });
+            this.messagePublisher.Publish(new SendToMeIn { Id = @event.Id, Seconds = 13, Message = "" });
         }
 
         public void Handle(RemoveFrom10sWindow @event)
         {
-            var index = this.window10s.IndexOf(this.window10s.First(p => p == @event.Price));
-            this.window10s.RemoveAt(index);
+            var list = this.allWindows10s[@event.Id];
+            var index = list.IndexOf(list.First(p => p == @event.Price));
+
+            list.RemoveAt(index);
         }
 
         public void Handle(RemoveFrom13sWindow @event)
         {
-            var index = this.window13s.IndexOf(this.window13s.First(p => p == @event.Price));
-            this.window13s.RemoveAt(index);
+            var list = this.allWindows13s[@event.Id];
+            var index = list.IndexOf(list.First(p => p == @event.Price));
+
+            list.RemoveAt(index);
         }
     }
 }
