@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TrailingStopLoss.Events
+﻿namespace TrailingStopLoss.Events
 {
-    class StopLossHit
+    using System;
+
+    public class StopLossHit
     {
+        public Guid Id { get; set; }
     }
 }

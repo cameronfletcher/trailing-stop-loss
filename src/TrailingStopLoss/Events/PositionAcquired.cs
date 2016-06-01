@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TrailingStopLoss.Events
+﻿namespace TrailingStopLoss.Events
 {
-    class PositionAcquired
+    using System;
+
+    public class PositionAcquired
     {
+        public Guid Id { get; set; }
+
+        public int Price { get; set; }
     }
 }
