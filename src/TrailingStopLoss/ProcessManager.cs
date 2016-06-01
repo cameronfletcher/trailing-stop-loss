@@ -14,7 +14,7 @@
 
         private readonly IMessagePublisher messagePublisher;
 
-        private int stopLossPrice;
+        private int stopLossPrice = 0;
 
         public ProcessManager(IMessagePublisher messagePublisher)
         {
@@ -50,7 +50,11 @@
 
             list.RemoveAt(index);
 
-            this.stopLossPrice = list.Min();
+            if (list.Any())
+            {
+                this.stopLossPrice = list.Min();
+            }
+
             this.messagePublisher.Publish(new StopLossPriceUpdated { InstrumentId = @event.InstrumentId, Price = this.stopLossPrice });            
         }
 
@@ -58,7 +62,7 @@
         {
             var list = this.allWindows13s[@event.InstrumentId];
 
-            if (list.Max() < stopLossPrice)
+            if (list.Max() <= this.stopLossPrice)
             {
                 this.messagePublisher.Publish(new StopLossHit { InstrumentId = @event.InstrumentId });
             }

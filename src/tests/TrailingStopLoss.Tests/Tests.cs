@@ -8,109 +8,88 @@
     using TrailingStopLoss;
     using FakeItEasy;
     using Xunit;
+    using Events;
+    using Commands;
     public class Tests
     {
-        [Scenario]
-        public void AquireAPosition(
-            IMessagePublisher messagePublisher,
-            ProcessManager processorManager,
-            Guid instrumentId,
-            int initialPrice,
-            List<object> messagePublished,
-            int dummyPrice)
+        private List<object> messagesPublished;
+        private IMessagePublisher messagePublisher;
+        private ProcessManager processorManager;
+        private Guid instrumentId;
+
+        [Background]
+        public void Background()
         {
             "Given a message publisher"
                 .f(() =>
                 {
-                    messagePublished = new List<object>();
+                    messagesPublished = new List<object>();
                     messagePublisher = A.Fake<IMessagePublisher>();
 
                     A.CallTo(() => messagePublisher.Publish(A<object>.Ignored))
-                    .Invokes(call => 
-                    {
-                        var message = (call.Arguments.First());
-                        messagePublished.Add(message);
-                    });
-                });
-
-            "And a process manager"
-                .f(() => { processorManager = new ProcessManager(messagePublisher); });
-
-            "And an instrument ID"
-                .f(() => { instrumentId = Guid.NewGuid(); });
-
-            "When I aquire a position"
-                .f(() =>
-                {
-                    initialPrice = 23556;
-                    processorManager.Handle(
-                        new Events.PositionAcquired()
+                        .Invokes(call =>
                         {
-                            InstrumentId = instrumentId,
-                            Price = initialPrice
+                            var message = (call.Arguments.First());
+                            messagesPublished.Add(message);
                         });
                 });
 
-            "Then I publish a message to update the stop loss price"
-                .f(() =>
-                {
-                    messagePublished.Count.Should().Be(3);
+            "And a process manager"
+                .f(() => processorManager = new ProcessManager(messagePublisher));
 
-                    var stopLossPriceUpdatedMessage = messagePublished[0] as Events.StopLossPriceUpdated;
-                    stopLossPriceUpdatedMessage.Should().NotBeNull();
-                    stopLossPriceUpdatedMessage.InstrumentId.Should().Be(instrumentId);
-                    stopLossPriceUpdatedMessage.Price.Should().Be(initialPrice);
-
-                    var sendMeInCommand1 = messagePublished[1] as Commands.SendToMeIn;
-                    sendMeInCommand1.Should().NotBeNull();
-                    var removeIn10Seconds = sendMeInCommand1.Message as Commands.RemoveFrom10sWindow;
-                    removeIn10Seconds.Should().NotBeNull();
-
-                    removeIn10Seconds.InstrumentId.Should().Be(instrumentId);
-                    removeIn10Seconds.Price.Should().Be(initialPrice);
-
-                    var sendMeInCommand2 = messagePublished[2] as Commands.SendToMeIn;
-                    sendMeInCommand2.Should().NotBeNull();
-                    var removeIn13Seconds = sendMeInCommand2.Message as Commands.RemoveFrom13sWindow;
-                    removeIn13Seconds.Should().NotBeNull();
-
-                    removeIn13Seconds.InstrumentId.Should().Be(instrumentId);
-                    removeIn13Seconds.Price.Should().Be(initialPrice);
-                });
+            "And an instrument ID"
+                .f(() => instrumentId = Guid.NewGuid());
         }
 
-        /*[Scenario]
-        public void AquireAPositionAndRemoveThePriceIn10Seconds(
-            IMessagePublisher messagePublisher, 
-            ProcessManager processorManager, 
-            int initialPrice,
-            List<object> eventsPublished)
+        [Scenario]
+        public void StopLossTriggerred(int initialPrice, int secondPrice, int thirdPrice)
         {
-            "Given a message publisher"
-                .f(() => 
-                {
-                    messagePublisher = A.Fake<IMessagePublisher>();
-                    A.CallTo(() => messagePublisher.Publish(A<object>._)).Invokes(x => eventsPublished.Add(x));
-                });
+            "Given an initial price"
+                .f(() => initialPrice = 10);
 
-            "And a process manager"
-                .f(() => { processorManager = new ProcessManager(messagePublisher); });
-             
-            "When I aquire a position"
-                .f(() => 
-                {
-                    initialPrice = 23556;
-                    processorManager.Handle(new Events.PositionAcquired() { Id = Guid.NewGuid(), Price = initialPrice });
-                });
+            "Given an second price"
+                .f(() => secondPrice = 9);
 
-            "Then I publish a message to remove the price in 10 seconds"
-                .f(() => 
+            "Given an second price"
+                .f(() => thirdPrice = 8);
+
+            "When I acquire a position with that initial price"
+                .f(() => this.processorManager.Handle(new PositionAcquired { InstrumentId = instrumentId, Price = initialPrice }));
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new PriceUpdated { InstrumentId = instrumentId, Price = secondPrice }));
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new PriceUpdated { InstrumentId = instrumentId, Price = thirdPrice }));
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new RemoveFrom10sWindow { InstrumentId = instrumentId, Price = initialPrice }));
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new RemoveFrom10sWindow { InstrumentId = instrumentId, Price = secondPrice }));
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new RemoveFrom10sWindow { InstrumentId = instrumentId, Price = thirdPrice }));
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new RemoveFrom13sWindow { InstrumentId = instrumentId, Price = initialPrice }));
+
+            "And I clear the published messages"
+                .f(() => this.messagesPublished.Clear());
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new RemoveFrom13sWindow { InstrumentId = instrumentId, Price = secondPrice }));
+  
+
+            "And I get a price update"
+                .f(() => this.processorManager.Handle(new RemoveFrom13sWindow { InstrumentId = instrumentId, Price = thirdPrice }));
+
+            "Then a message is published to update the stop loss price"
+                .f(() =>
                 {
-                    eventsPublished.Count.Should().Be(1);
-                    var command = eventsPublished.Single() as Commands.RemoveFrom10Window;
-                    command.Should().NotBeNull();
-                    command.Price.Should().Be(initialPrice);
+                    var message = (StopLossHit)this.messagesPublished[0];
+                    message.InstrumentId.Should().Be(this.instrumentId);
                 });
-        }*/
+        }
     }
 }
