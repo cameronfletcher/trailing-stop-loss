@@ -3,11 +3,11 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using FakeItEasy;
     using FluentAssertions;
-    using TrailingStopLoss;
     using Xbehave;
-
+    using TrailingStopLoss;
+    using FakeItEasy;
+    using Xunit;
     public class Tests
     {
         [Scenario]
@@ -16,7 +16,8 @@
             ProcessManager processorManager,
             Guid instrumentId,
             int initialPrice,
-            List<object> messagePublished)
+            List<object> messagePublished,
+            int dummyPrice)
         {
             "Given a message publisher"
                 .f(() =>
@@ -53,11 +54,28 @@
             "Then I publish a message to update the stop loss price"
                 .f(() =>
                 {
-                    messagePublished.Count.Should().Be(1);
-                    var command = messagePublished.Single() as Events.StopLossPriceUpdated;
-                    command.Should().NotBeNull();
-                    command.InstrumentId.Should().Be(instrumentId);
-                    command.Price.Should().Be(initialPrice);
+                    messagePublished.Count.Should().Be(3);
+
+                    var stopLossPriceUpdatedMessage = messagePublished[0] as Events.StopLossPriceUpdated;
+                    stopLossPriceUpdatedMessage.Should().NotBeNull();
+                    stopLossPriceUpdatedMessage.InstrumentId.Should().Be(instrumentId);
+                    stopLossPriceUpdatedMessage.Price.Should().Be(initialPrice);
+
+                    var sendMeInCommand1 = messagePublished[1] as Commands.SendToMeIn;
+                    sendMeInCommand1.Should().NotBeNull();
+                    var removeIn10Seconds = sendMeInCommand1.Message as Commands.RemoveFrom10sWindow;
+                    removeIn10Seconds.Should().NotBeNull();
+
+                    removeIn10Seconds.InstrumentId.Should().Be(instrumentId);
+                    removeIn10Seconds.Price.Should().Be(initialPrice);
+
+                    var sendMeInCommand2 = messagePublished[2] as Commands.SendToMeIn;
+                    sendMeInCommand2.Should().NotBeNull();
+                    var removeIn13Seconds = sendMeInCommand2.Message as Commands.RemoveFrom13sWindow;
+                    removeIn13Seconds.Should().NotBeNull();
+
+                    removeIn13Seconds.InstrumentId.Should().Be(instrumentId);
+                    removeIn13Seconds.Price.Should().Be(initialPrice);
                 });
         }
 
