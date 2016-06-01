@@ -11,7 +11,7 @@
     public class Tests
     {
         [Scenario]
-        public void AquireAPositionAndRemoveThePriceIn10Seconds(
+        public void AquireAPosition(
             IMessagePublisher messagePublisher,
             ProcessManager processorManager,
             int initialPrice,
@@ -41,7 +41,7 @@
                     processorManager.Handle(new Events.PositionAcquired() { Id = Guid.NewGuid(), Price = initialPrice });
                 });
 
-            "Then I publish a message to remove the price in 10 seconds"
+            "Then I publish a message to update the stop loss price"
                 .f(() =>
                 {
                     eventsPublished.Count.Should().Be(1);
