@@ -234,8 +234,25 @@
             "And I get a price update"
                 .f(() => this.processorManager.Handle(new PriceUpdated { InstrumentId = instrumentId, Price = secondPrice }));
 
+            "And the windows for the initial price are triggered"
+                .f(() =>
+                {
+                    this.processorManager.Handle(new RemoveFrom10sWindow { InstrumentId = instrumentId, Price = initialPrice });
+                    this.processorManager.Handle(new RemoveFrom13sWindow { InstrumentId = instrumentId, Price = initialPrice });
+                });
+
+            "And the windows for the second price are triggered"
+                .f(() =>
+                {
+                    this.processorManager.Handle(new RemoveFrom10sWindow { InstrumentId = instrumentId, Price = secondPrice });
+                    this.processorManager.Handle(new RemoveFrom13sWindow { InstrumentId = instrumentId, Price = secondPrice });
+                });
+
             "And I get another price update"
                 .f(() => this.processorManager.Handle(new PriceUpdated { InstrumentId = instrumentId, Price = thirdPrice }));
+
+            "And the 10s windows for the third price is triggered"
+                .f(() => this.processorManager.Handle(new RemoveFrom10sWindow { InstrumentId = instrumentId, Price = thirdPrice }));
 
             "And I clear the published messages"
                 .f(() => this.messagesPublished.Clear());

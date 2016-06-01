@@ -49,8 +49,11 @@
             var index = list.IndexOf(list.First(p => p == @event.Price));
 
             list.RemoveAt(index);
+            if (list.Any())
+            {
+                this.stopLossPrice = list.Min();
+            }
 
-            this.stopLossPrice = list.Min();
             this.messagePublisher.Publish(new StopLossPriceUpdated { InstrumentId = @event.InstrumentId, Price = this.stopLossPrice });            
         }
 
